@@ -1,0 +1,101 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content class="dlg-body">
+  @if (dlgData.employee; as emp) {
+    <div class="read-badge">
+      <span class="lab">Statut</span>
+      <span class="val">{{ emp.status }}</span>
+    </div>
+    <div class="read-badge subtle">
+      <span class="lab">Dernier salaire brut (API)</span>
+      <span class="val">{{ salaryLabel(emp) }} MAD</span>
+    </div>
+  }
+  <form [formGroup]="form" id="employee-form-id" class="grid-form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="firstName" autocomplete="given-name" />
+      @if (form.controls.firstName.hasError('required') && form.controls.firstName.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="lastName" autocomplete="family-name" />
+      @if (form.controls.lastName.hasError('required') && form.controls.lastName.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="span-2">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="email" />
+      @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+        <mat-error>Requis</mat-error>
+      }
+      @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+        <mat-error>Email invalide</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Téléphone</mat-label>
+      <input matInput formControlName="phone" autocomplete="tel" />
+      <mat-hint>Optionnel</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Poste</mat-label>
+      <input matInput formControlName="position" autocomplete="organization-title" />
+      @if (form.controls.position.hasError('required') && form.controls.position.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="span-2">
+      <mat-label>Département</mat-label>
+      <mat-select formControlName="departmentId" required>
+        @for (d of svc.departments(); track d.id) {
+          <mat-option [value]="d.id">{{ d.name }}</mat-option>
+        }
+      </mat-select>
+      @if (svc.departmentsLoadError(); as deptErr) {
+        <mat-hint class="warn-hint">{{ deptErr }}</mat-hint>
+      } @else if (!svc.departments().length && !dlgData.viewOnly) {
+        <mat-hint class="warn-hint">Aucun département disponible.</mat-hint>
+      }
+      @if (form.controls.departmentId.invalid && form.controls.departmentId.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="span-2">
+      <mat-label>Statut métier</mat-label>
+      <mat-select formControlName="statusUi" required>
+        @for (s of statuses; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date embauche</mat-label>
+      <input matInput [matDatepicker]="dp" formControlName="hireDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+      <mat-datepicker #dp></mat-datepicker>
+      @if (form.controls.hireDate.invalid && form.controls.hireDate.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  @if (!dlgData.viewOnly) {
+    <button mat-button type="button" (click)="cancel()" [disabled]="submitting">Annuler</button>
+    <button mat-flat-button color="primary" type="submit" form="employee-form-id" [disabled]="submitting">
+      Enregistrer
+    </button>
+  } @else {
+    <button mat-flat-button type="button" mat-dialog-close color="primary">Fermer</button>
+  }
+</mat-dialog-actions>

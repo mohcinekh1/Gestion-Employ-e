@@ -1,0 +1,236 @@
+<div class="abs-page">
+  <div class="stats-row">
+    <article class="stat-card">
+      <span class="stat-lab">En attente</span>
+      <strong class="stat-val font-mono">{{ pendingCount().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">En congé (mois)</span>
+      <strong class="stat-val font-mono st-blue">{{ onLeaveThisMonth().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">Approuvées ce mois</span>
+      <strong class="stat-val font-mono st-green">{{ approvedThisMonth().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">Moy. jours consommés</span>
+      <strong class="stat-val font-mono">{{
+        averageDaysConsumed().toLocaleString('fr-MA', { maximumFractionDigits: 1 })
+      }}</strong>
+    </article>
+  </div>
+
+  <div class="split-row">
+    <app-absence-calendar class="split-cal" />
+
+    <section class="panel pending-panel split-pending">
+      <header class="panel-h">
+        <h2 class="panel-title">Demandes en attente</h2>
+        <span class="panel-sub font-mono">{{ pendingCount().toLocaleString('fr-MA') }}</span>
+      </header>
+
+      @if (!pendingSorted().length) {
+        <p class="empty-p">Aucune demande en attente.</p>
+      } @else {
+        <ul class="pending-list">
+          @for (a of pendingSorted(); track a.id) {
+            <li class="pending-row">
+              <div
+                class="avatar"
+                [style.background]="avatarColor(a.id + a.employeeId * 101)"
+              >{{ a.employeeInitials }}</div>
+              <div class="meta">
+                <div class="nm">{{ a.employeeName }}</div>
+                <div class="sub">{{ a.department }}</div>
+              </div>
+              <span [class]="typeBadgeClass(a.type)">{{ typeLabel(a.type) }}</span>
+              <div class="dates font-mono">
+                {{ a.startDate | date: 'dd/MM/yyyy':'':'fr-FR' }} →
+                {{ a.endDate | date: 'dd/MM/yyyy':'':'fr-FR' }}
+              </div>
+              <div class="dur font-mono">{{ a.workingDays.toLocaleString('fr-MA') }} j</div>
+              <div class="acts">
+                <button mat-icon-button type="button" matTooltip="Voir" aria-label="Voir" (click)="openView(a)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                @if (canApprove()) {
+                  <button mat-icon-button type="button" class="ok" aria-label="Approuver" (click)="openApprove(a)">
+                    <mat-icon>check_circle</mat-icon>
+                  </button>
+                  <button mat-icon-button type="button" class="ko" aria-label="Refuser" (click)="openReject(a)">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  <section class="panel toolbar-panel">
+    <div class="filters">
+      <mat-form-field appearance="outline" class="fusearch" subscriptSizing="dynamic">
+        <mat-label>Rechercher</mat-label>
+        <input
+          matInput
+          type="search"
+          placeholder="Nom, département…"
+          [value]="search()"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="fuselect" subscriptSizing="dynamic">
+        <mat-label>Type</mat-label>
+        <mat-select [value]="typeFilter()" (valueChange)="setTypeFilter($event ?? '')">
+          <mat-option value="">Tous</mat-option>
+          @for (t of typeOptionsUi; track t) {
+            <mat-option [value]="t">{{ typeLabel(t) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="fuselect" subscriptSizing="dynamic">
+        <mat-label>Département</mat-label>
+        <mat-select [value]="deptFilter()" (valueChange)="setDeptFilter($event ?? '')">
+          <mat-option value="">Tous</mat-option>
+          @for (d of departmentOptions(); track d) {
+            <mat-option [value]="d">{{ d }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="toolbar-right">
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        class="tabs"
+        [value]="tabFilter()"
+        (change)="onTabChange($event)"
+      >
+        @for (t of TAB_OPTIONS; track t) {
+          <mat-button-toggle [value]="t">{{ tabLabel(t) }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+      <button mat-flat-button type="button" color="primary" class="cta" (click)="openNew()">
+        Nouvelle demande
+      </button>
+    </div>
+  </section>
+
+  <section class="panel table-shell">
+    <div class="table-wrap">
+      <table mat-table [dataSource]="pagedRows()" class="dense">
+        <ng-container matColumnDef="employee">
+          <th mat-header-cell *matHeaderCellDef>Employé</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="emp-cell">
+              <div class="avatar" [style.background]="avatarColor(row.employeeId)">{{ row.employeeInitials }}</div>
+              <div class="emp-meta">
+                <div class="emp-name">{{ row.employeeName }}</div>
+                <div class="emp-mail">{{ row.department }}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let row">
+            <span [class]="typeBadgeClass(row.type)">{{ typeLabel(row.type) }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="start">
+          <th mat-header-cell *matHeaderCellDef>Date début</th>
+          <td mat-cell *matCellDef="let row">{{ row.startDate | date: 'dd/MM/yyyy':'':'fr-FR' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="end">
+          <th mat-header-cell *matHeaderCellDef>Date fin</th>
+          <td mat-cell *matCellDef="let row">{{ row.endDate | date: 'dd/MM/yyyy':'':'fr-FR' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="workingDays">
+          <th mat-header-cell *matHeaderCellDef>Durée</th>
+          <td mat-cell *matCellDef="let row" class="mono-cell font-mono">
+            {{ row.workingDays.toLocaleString('fr-MA') }} j
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="remaining">
+          <th mat-header-cell *matHeaderCellDef>Solde restant</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="balance">
+              <span class="mono font-mono">{{ row.remainingBalance.toLocaleString('fr-MA') }} j</span>
+              <div class="bal-track" aria-hidden="true">
+                <div class="bal-fill" [style.width.%]="balanceBarPct(row.remainingBalance)"></div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let row">
+            <span [class]="statusBadgeClass(row.status)">{{ statusLabel(row.status) }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="requestedAt">
+          <th mat-header-cell *matHeaderCellDef>Demandé le</th>
+          <td mat-cell *matCellDef="let row">{{ row.requestedAt | date: 'dd/MM/yyyy':'':'fr-FR' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions"></th>
+          <td mat-cell *matCellDef="let row" class="cell-actions">
+            @if (canApprove() && row.status === 'EN_ATTENTE') {
+              <button
+                mat-icon-button
+                type="button"
+                class="ok"
+                aria-label="Approuver"
+                matTooltip="Approuver"
+                (click)="openApprove(row)"
+              >
+                <mat-icon>check_circle</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                class="ko"
+                aria-label="Refuser"
+                matTooltip="Refuser"
+                (click)="openReject(row)"
+              >
+                <mat-icon>cancel</mat-icon>
+              </button>
+            }
+            <button mat-icon-button type="button" matTooltip="Voir" aria-label="Voir" (click)="openView(row)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackByAbsence"></tr>
+      </table>
+    </div>
+
+    @if (!pageLength()) {
+      <p class="empty-t">Aucune absence trouvée.</p>
+    }
+
+    <mat-paginator
+      [length]="pageLength()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="onPaginator($event)"
+      showFirstLastButtons
+    />
+  </section>
+</div>

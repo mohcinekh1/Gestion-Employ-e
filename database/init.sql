@@ -1,0 +1,90 @@
+CREATE DATABASE IF NOT EXISTS hr_manager
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE hr_manager;
+
+CREATE TABLE departments (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE employees (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  phone VARCHAR(30) NULL,
+  hire_date DATE NOT NULL,
+  position VARCHAR(100) NOT NULL,
+  status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+  department_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_employees_department
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT
+);
+
+ALTER TABLE departments
+  ADD COLUMN manager_employee_id BIGINT NULL,
+  ADD CONSTRAINT fk_departments_manager_employee
+    FOREIGN KEY (manager_employee_id) REFERENCES employees(id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+CREATE TABLE users (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(80) NOT NULL UNIQUE,
+  email VARCHAR(150) NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('ADMIN', 'MANAGER', 'EMPLOYEE') NOT NULL,
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  employee_id BIGINT NULL UNIQUE,
+  last_login_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_users_employee
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);
+
+CREATE TABLE salaries (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  employee_id BIGINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  effective_date DATE NOT NULL,
+  type ENUM('MENSUEL', 'ANNUEL') NOT NULL,
+  currency CHAR(3) NOT NULL DEFAULT 'EUR',
+  note VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_salaries_employee
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
+
+CREATE TABLE absences (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  employee_id BIGINT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  type ENUM('CONGE_PAYE', 'MALADIE', 'SANS_SOLDE', 'AUTRE') NOT NULL,
+  status ENUM('EN_ATTENTE', 'APPROUVE', 'REFUSE') NOT NULL DEFAULT 'EN_ATTENTE',
+  reason VARCHAR(500) NULL,
+  reviewed_by_user_id BIGINT NULL,
+  reviewed_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chk_absence_dates CHECK (end_date >= start_date),
+  CONSTRAINT fk_absences_employee
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT fk_absences_reviewed_by
+    FOREIGN KEY (reviewed_by_user_id) REFERENCES users(id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);

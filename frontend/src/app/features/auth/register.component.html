@@ -1,0 +1,72 @@
+<app-auth-shell>
+  <form class="auth-form mat-auth" [formGroup]="form" (ngSubmit)="submit()">
+    <h1 class="auth-title">Inscription employé</h1>
+    <p class="auth-sub">
+      Créez votre profil pour accéder à vos absences. Vous rejoindrez le département choisi avec le statut actif.
+    </p>
+
+    @if (loadMetaError()) {
+      <p class="auth-error">{{ loadMetaError() }}</p>
+    }
+
+    @if (submitError()) {
+      <p class="auth-error">{{ submitError() }}</p>
+    }
+
+    <div class="auth-grid">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Prénom</mat-label>
+        <input matInput formControlName="firstName" autocomplete="given-name" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="lastName" autocomplete="family-name" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>E-mail</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="email" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>Téléphone</mat-label>
+      <input matInput type="tel" formControlName="phone" autocomplete="tel" />
+      <mat-hint>Optionnel</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>Poste / fonction</mat-label>
+      <input matInput formControlName="position" autocomplete="organization-title" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>Département</mat-label>
+      <mat-select formControlName="departmentId">
+        @for (d of departments(); track d.id) {
+          <mat-option [value]="d.id">{{ d.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>Date d’embauche</mat-label>
+      <input matInput type="date" formControlName="hireDate" />
+      <mat-hint>Optionnel — défaut : aujourd’hui</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
+      <mat-label>Mot de passe</mat-label>
+      <input matInput type="password" autocomplete="new-password" formControlName="password" />
+    </mat-form-field>
+
+    <button mat-flat-button class="auth-submit-mat full" color="primary" type="submit" [disabled]="loading() || !departments().length">
+      Créer mon compte et me connecter
+    </button>
+
+    <p class="auth-switch">
+      Déjà inscrit ?
+      <a routerLink="/login">Connexion</a>
+    </p>
+  </form>
+</app-auth-shell>

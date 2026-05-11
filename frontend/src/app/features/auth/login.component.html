@@ -1,0 +1,23 @@
+<app-auth-shell>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <h1 class="auth-title">Connexion</h1>
+    <p class="auth-sub">Accédez à votre espace Gestion employé</p>
+
+    <label class="auth-label" for="login-user">E-mail ou identifiant</label>
+    <input id="login-user" class="auth-input" type="text" autocomplete="username" formControlName="username" />
+
+    <label class="auth-label" for="login-pass">Mot de passe</label>
+    <input id="login-pass" class="auth-input" type="password" autocomplete="current-password" formControlName="password" />
+
+    @if (errorMessage()) {
+      <p class="auth-error">{{ errorMessage() }}</p>
+    }
+
+    <button class="auth-submit" type="submit" [disabled]="loading()">Se connecter</button>
+
+    <p class="auth-switch">
+      Pas encore de compte ?
+      <a routerLink="/register">Créer un compte employé</a>
+    </p>
+  </form>
+</app-auth-shell>

@@ -1,0 +1,60 @@
+.users-page {
+  padding: 20px 24px;
+  max-width: 980px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  button mat-icon {
+    margin-right: 6px;
+    vertical-align: middle;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.col-actions {
+  width: 52px;
+  text-align: right;
+}
+
+.ttl {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink2);
+  font-size: 13px;
+}
+
+.err {
+  color: var(--coral-600);
+  margin-bottom: 12px;
+}
+
+.tbl-wrap {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: auto;
+}
+
+table.dense {
+  width: 100%;
+}

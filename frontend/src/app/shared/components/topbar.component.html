@@ -1,0 +1,28 @@
+<header class="topbar">
+  <div class="topbar-leading">
+    <button
+      type="button"
+      class="nav-menu-btn"
+      aria-label="Ouvrir le menu de navigation"
+      (click)="shellUi.toggleMobileNav()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="topbar-context">
+      <h1 class="title">{{ pageTitle() }}</h1>
+      <p class="date">{{ today | date: "EEEE d MMMM y" }}</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    @if (canManageEmployees()) {
+      <a class="btn btn-solid" routerLink="/employees">
+        <tabler-icon [icon]="iconUserPlus" [size]="18" color="#ffffff" />
+        Nouvel employé
+      </a>
+    }
+    <button type="button" class="btn btn-outline" (click)="authService.logout()">
+      Déconnexion
+    </button>
+  </div>
+</header>

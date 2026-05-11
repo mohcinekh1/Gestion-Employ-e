@@ -1,0 +1,25 @@
+.dlg-body {
+  min-width: min(440px, 92vw);
+  padding-top: 8px !important;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 4px;
+
+  .span-2 {
+    grid-column: 1 / -1;
+  }
+}
+
+.toggle-row {
+  margin-top: 4px;
+}
+
+.form-err {
+  color: var(--coral-600, #c62828);
+  margin: 0 0 12px;
+  font-size: 13px;
+}

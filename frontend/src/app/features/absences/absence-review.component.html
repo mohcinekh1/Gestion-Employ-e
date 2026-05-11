@@ -1,0 +1,83 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content class="dlg-body">
+  @if (errorMsg) {
+    <p class="err">{{ errorMsg }}</p>
+  }
+
+  <div class="summary">
+    <div class="row">
+      <span class="k">Employé</span>
+      <span class="v">{{ data.absence.employeeName }}</span>
+    </div>
+    <div class="row">
+      <span class="k">Département</span>
+      <span class="v">{{ data.absence.department }}</span>
+    </div>
+    <div class="row">
+      <span class="k">Type</span>
+      <span class="v">{{ typeLabel(data.absence) }}</span>
+    </div>
+    <div class="row">
+      <span class="k">Période</span>
+      <span class="v font-mono"
+        >{{ data.absence.startDate | date: 'dd/MM/yyyy':'':'fr-FR' }} —
+        {{ data.absence.endDate | date: 'dd/MM/yyyy':'':'fr-FR' }}</span
+      >
+    </div>
+    <div class="row">
+      <span class="k">Durée ouvrée</span>
+      <span class="v font-mono">{{ data.absence.workingDays.toLocaleString('fr-MA') }} j</span>
+    </div>
+    <div class="row">
+      <span class="k">Solde restant</span>
+      <span class="v font-mono">{{ data.absence.remainingBalance.toLocaleString('fr-MA') }} j</span>
+    </div>
+    <div class="row">
+      <span class="k">Statut</span>
+      <span class="v">{{ statusLabel(data.absence) }}</span>
+    </div>
+    <div class="row">
+      <span class="k">Demandé le</span>
+      <span class="v">{{ data.absence.requestedAt | date: 'dd/MM/yyyy':'':'fr-FR' }}</span>
+    </div>
+    @if (data.absence.approvedBy) {
+      <div class="row">
+        <span class="k">Validé par</span>
+        <span class="v">{{ data.absence.approvedBy }}</span>
+      </div>
+    }
+    @if (data.absence.rejectionReason) {
+      <div class="row">
+        <span class="k">Motif refus</span>
+        <span class="v">{{ data.absence.rejectionReason }}</span>
+      </div>
+    }
+  </div>
+
+  @if (data.mode === 'reject') {
+    <form [formGroup]="rejectForm" class="reject-form">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Motif du refus (obligatoire)</mat-label>
+        <textarea matInput rows="3" formControlName="reason" required></textarea>
+        @if (rejectForm.controls.reason.touched && rejectForm.controls.reason.hasError('required')) {
+          <mat-error>Un motif est requis.</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dlg-actions">
+  <button mat-stroked-button type="button" (click)="close()" [disabled]="submitting">Fermer</button>
+  @if (data.mode === 'approve') {
+    <button mat-flat-button type="button" color="primary" (click)="confirmApprove()" [disabled]="submitting">
+      Confirmer l’approbation
+    </button>
+  }
+  @if (data.mode === 'reject') {
+    <button mat-flat-button type="button" color="warn" (click)="confirmReject()" [disabled]="submitting">
+      Confirmer le refus
+    </button>
+  }
+</mat-dialog-actions>

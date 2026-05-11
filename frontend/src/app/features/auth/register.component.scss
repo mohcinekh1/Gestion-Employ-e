@@ -1,0 +1,21 @@
+@use './auth-forms.shared.scss';
+
+.mat-auth .auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full {
+  width: 100%;
+}
+
+.auth-submit-mat {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+}

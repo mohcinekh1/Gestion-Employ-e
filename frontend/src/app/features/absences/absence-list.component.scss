@@ -1,0 +1,385 @@
+:host {
+  display: block;
+}
+
+.abs-page {
+  padding: 28px 32px 40px;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.stat-lab {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+
+.stat-val {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink1);
+
+  &.st-green {
+    color: var(--green-700, var(--green-600));
+  }
+
+  &.st-blue {
+    color: var(--blue-600);
+  }
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 1.05fr minmax(340px, 0.72fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.split-cal {
+  min-width: 0;
+}
+
+.split-pending {
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+
+  .panel-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink1);
+  }
+
+  .panel-sub {
+    font-size: 13px;
+    color: var(--ink3);
+    font-weight: 600;
+  }
+}
+
+.pending-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  max-height: 420px;
+}
+
+.pending-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1.2fr) auto minmax(0, 1.2fr) 56px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg0);
+
+  .nm {
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+
+  .sub {
+    font-size: 12px;
+    color: var(--ink2);
+    margin-top: 2px;
+  }
+
+  .dates {
+    font-size: 12px;
+    color: var(--ink2);
+  }
+
+  .dur {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .acts {
+    display: flex;
+    justify-content: flex-end;
+
+    button.ok ::ng-deep .mat-icon {
+      color: var(--green-600);
+    }
+
+    button.ko ::ng-deep .mat-icon {
+      color: var(--coral-600);
+    }
+  }
+}
+
+.empty-p,
+.empty-t {
+  padding: 12px 4px;
+  color: var(--ink2);
+  font-size: 13px;
+  margin: 0;
+}
+
+.toolbar-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.toolbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  .cta {
+    border-radius: 10px !important;
+  }
+}
+
+.fusearch {
+  min-width: 220px;
+  flex: 1 1 200px;
+
+  &::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--bg2);
+    border-radius: 10px;
+  }
+}
+
+.fuselect {
+  min-width: 160px;
+
+  &::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--bg2);
+    border-radius: 10px;
+  }
+}
+
+.tabs.mat-button-toggle-group {
+  border-radius: 10px !important;
+  overflow: hidden;
+  border: 1px solid var(--border) !important;
+  padding: 0;
+}
+
+.tabs ::ng-deep .mat-button-toggle {
+  border: none !important;
+}
+
+.tabs ::ng-deep .mat-button-toggle-checked.mat-button-toggle {
+  background: var(--ink1) !important;
+  color: #fff !important;
+}
+
+.table-shell {
+  padding: 0 0 8px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table.dense {
+  width: 100%;
+}
+
+.emp-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.emp-meta {
+  min-width: 0;
+}
+
+.emp-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.emp-mail {
+  font-size: 12px;
+  color: var(--ink2);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.25px;
+  padding: 4px 9px;
+  border-radius: 999px;
+
+  &--annual {
+    background: var(--blue-50);
+    color: var(--blue-800);
+  }
+
+  &--sick {
+    background: var(--amber-50);
+    color: var(--amber-800);
+  }
+
+  &--exc {
+    background: var(--teal-50);
+    color: var(--teal-800);
+  }
+
+  &--other {
+    background: var(--gray-50);
+    color: var(--gray-800);
+  }
+}
+
+.mono-cell {
+  font-weight: 600;
+}
+
+.balance {
+  min-width: 120px;
+
+  .mono {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .bal-track {
+    margin-top: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .bal-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--green-600), var(--teal-600));
+  }
+}
+
+.st {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  padding: 4px 9px;
+  border-radius: 999px;
+
+  &--wait {
+    background: var(--amber-50);
+    color: var(--amber-800);
+  }
+
+  &--ok {
+    background: var(--green-50);
+    color: var(--green-800);
+  }
+
+  &--no {
+    background: var(--coral-50);
+    color: var(--coral-800);
+  }
+}
+
+.col-actions {
+  width: 120px;
+  text-align: right;
+}
+
+.cell-actions {
+  text-align: right;
+  white-space: nowrap;
+
+  button.ok ::ng-deep .mat-icon {
+    color: var(--green-600);
+  }
+
+  button.ko ::ng-deep .mat-icon {
+    color: var(--coral-600);
+  }
+}
+
+@media (max-width: 1080px) {
+  .split-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pending-row {
+    grid-template-columns: 40px 1fr;
+    grid-template-rows: auto auto auto;
+
+    .acts {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,46 @@
+<aside class="sidebar">
+  <div class="logo">
+    <div class="mark">
+      <tabler-icon [icon]="iconBriefcase" [size]="22" color="#ffffff" />
+    </div>
+    <div class="brand">
+      <strong>Gestion employé</strong>
+      <span>Gestion des employés</span>
+    </div>
+  </div>
+
+  <p class="section-label">Principal</p>
+  <nav class="nav">
+    @for (item of principalNav(); track item.path) {
+      <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+        <tabler-icon [icon]="resolveIcon(item.iconKey)" [size]="18" />
+        {{ item.label }}
+        @if (item.absencePendingBadge && pendingAbsenceBadgeLabel(); as b) {
+          <span class="badge">{{ b }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  @if (adminNav().length) {
+    <p class="section-label">Administration</p>
+    <nav class="nav">
+      @for (item of adminNav(); track item.path) {
+        <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+          <tabler-icon [icon]="resolveIcon(item.iconKey)" [size]="18" />
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+  }
+
+  <div class="footer-spacer"></div>
+
+  <div class="user-block">
+    <div class="avatar">{{ userInitials() }}</div>
+    <div class="meta">
+      <p class="name">{{ authService.currentUser()?.username ?? '—' }}</p>
+      <p class="role">{{ authService.currentUser()?.role ?? '' }}</p>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,50 @@
+<div class="slip">
+  <h2 mat-dialog-title class="sr-only">Bulletin de paie</h2>
+  <div class="slip-head">
+    <div class="brand">
+      <div class="logo">HR</div>
+      <div>
+        <strong>Gestion employé</strong>
+        <div class="sub">Bulletin de paie</div>
+      </div>
+    </div>
+    <div class="meta">
+      <h2 class="emp-name">{{ dlg.salary.employeeName }}</h2>
+      <p class="muted">{{ monthPretty(dlg.salary.month) }}</p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="slip-body">
+    <table class="lines">
+      <tbody>
+        <tr>
+          <td>Salaire brut</td>
+          <td class="num">{{ fmt(dlg.salary.grossSalary) }} MAD</td>
+        </tr>
+        <tr>
+          <td>CNSS <span class="hint">({{ pct(4.48) }})</span></td>
+          <td class="num muted">− {{ fmt(lines.cnss) }} MAD</td>
+        </tr>
+        <tr>
+          <td>AMO <span class="hint">({{ pct(2.26) }})</span></td>
+          <td class="num muted">− {{ fmt(lines.amo) }} MAD</td>
+        </tr>
+        <tr>
+          <td>Impôt sur le revenu (IR) <span class="hint">({{ pct(15.26) }})</span></td>
+          <td class="num muted">− {{ fmt(lines.ir) }} MAD</td>
+        </tr>
+        <tr class="total-row">
+          <td>Net à payer</td>
+          <td class="num strong net">{{ fmt(net) }} MAD</td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="close()">Fermer</button>
+    <button mat-flat-button color="primary" type="button" (click)="downloadPdf()">
+      Télécharger PDF
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,59 @@
+<div class="users-page panel-like">
+  <header class="head">
+    <div>
+      <h1 class="ttl">Utilisateurs</h1>
+      <p class="sub">Comptes d’accès (ADMIN uniquement).</p>
+    </div>
+    <div class="head-actions">
+      <button mat-stroked-button type="button" (click)="reload()">
+        <mat-icon>refresh</mat-icon>
+        Actualiser
+      </button>
+      <button mat-flat-button color="primary" type="button" (click)="openCreate()">
+        <mat-icon>person_add</mat-icon>
+        Nouveau compte
+      </button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <p class="err">{{ loadError() }}</p>
+  }
+
+  <div class="tbl-wrap">
+    <table mat-table [dataSource]="rows()" class="dense">
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef>Identifiant</th>
+        <td mat-cell *matCellDef="let row">{{ row.username }}</td>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Rôle</th>
+        <td mat-cell *matCellDef="let row">{{ row.role }}</td>
+      </ng-container>
+      <ng-container matColumnDef="enabled">
+        <th mat-header-cell *matHeaderCellDef>Actif</th>
+        <td mat-cell *matCellDef="let row">{{ row.enabled ? 'Oui' : 'Non' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="employeeId">
+        <th mat-header-cell *matHeaderCellDef>Employé ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.employeeId ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="col-actions"></th>
+        <td mat-cell *matCellDef="let row" class="col-actions">
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Modifier"
+            matTooltip="Modifier"
+            (click)="openEdit(row)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

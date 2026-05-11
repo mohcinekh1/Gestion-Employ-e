@@ -1,0 +1,48 @@
+.dlg-body {
+  padding-top: 10px !important;
+  max-width: 460px;
+
+  &::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--bg2);
+    border-radius: 10px;
+  }
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+
+  .span-2 {
+    grid-column: 1 / -1;
+  }
+}
+
+.hint {
+  font-size: 13px;
+
+  &.warn {
+    color: var(--coral-600);
+  }
+
+  .lab {
+    display: inline-block;
+    margin-right: 8px;
+    color: var(--ink3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+    font-size: 11px;
+  }
+}
+
+.err {
+  color: var(--coral-600);
+  margin-top: 0;
+  font-size: 13px;
+}
+
+.dlg-actions {
+  padding: 12px 24px 20px !important;
+  gap: 8px;
+}

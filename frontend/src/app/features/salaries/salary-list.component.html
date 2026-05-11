@@ -1,0 +1,205 @@
+<div class="sal-page">
+  @if (svc.loadError()) {
+    <p class="muted" style="margin-bottom: 12px">{{ svc.loadError() }}</p>
+  }
+  <div class="kpi-row">
+    <article class="kpi-card">
+      <span class="kpi-lab">Masse salariale du mois</span>
+      <strong class="kpi-val font-mono">{{ fmt(svc.totalMassGrossForMonth()) }} MAD</strong>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-lab">Salaire moyen brut</span>
+      <strong class="kpi-val font-mono">{{ fmt(svc.averageGrossRounded()) }} MAD</strong>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-lab">Enregistrements (mois)</span>
+      <strong class="kpi-val font-mono">
+        {{ filteredRows().length.toLocaleString('fr-MA') }}
+      </strong>
+      <p class="kpi-sub">
+        {{ svc.totalSalaryRecords().toLocaleString('fr-MA') }} bulletin(s) au total
+      </p>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-lab">Mois affiché</span>
+      <strong class="kpi-val kpi-accent">{{ svc.selectedMonthLongLabel() }}</strong>
+      <p class="kpi-sub">Filtre sur la date d’effet (AAAA-MM)</p>
+    </article>
+  </div>
+
+  <section class="panel chart-panel">
+    <header class="sec-head">
+      <div>
+        <h2 class="sec-title">Évolution masse brute / net</h2>
+        <p class="sec-sub">Six derniers mois glissants se terminant sur le mois affiché (données API)</p>
+      </div>
+    </header>
+    <div class="k-strip">
+      @for (m of svc.chartBrutTotals(); track m.key) {
+        <span class="k-pill">{{ formatKTotal(m.brut) }}</span>
+      }
+    </div>
+    <div class="chart-area">
+      <canvas
+        baseChart
+        type="bar"
+        [data]="barChartData()"
+        [options]="barChartOptions()"
+      ></canvas>
+    </div>
+    <div class="chart-leg">
+      <span><i class="sw-net"></i> Net à payer</span>
+      <span><i class="sw-sur"></i> Charges (brut − net)</span>
+    </div>
+  </section>
+
+  <section class="panel dept-panel">
+    <h2 class="sec-title">Répartition par département</h2>
+    <ul class="dept-lines">
+      @for (d of svc.deptBreakdown(); track d.department) {
+        <li>
+          <div class="dl-top">
+            <span>{{ d.department }}</span>
+            <span class="font-mono dl-amt">{{ fmt(d.mass) }} MAD</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="d.percent"></div>
+          </div>
+          <div class="dl-pct muted">{{ d.percent.toLocaleString('fr-MA') }} %</div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="panel toolbar-panel">
+    <div class="tb-row tb-filters">
+      <mat-form-field appearance="outline" class="fus" subscriptSizing="dynamic">
+        <mat-label>Rechercher</mat-label>
+        <input matInput type="search" [value]="searchQuery()" (input)="onSearch($any($event.target).value)" />
+      </mat-form-field>
+
+      <div class="month-nav">
+        <button mat-icon-button type="button" aria-label="Mois précédent" (click)="svc.prevMonth()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="month-label">{{ svc.selectedMonthLongLabel() }}</span>
+        <button mat-icon-button type="button" aria-label="Mois suivant" (click)="svc.nextMonth()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      <mat-form-field appearance="outline" class="fus sm" subscriptSizing="dynamic">
+        <mat-label>Département</mat-label>
+        <mat-select [value]="deptFilter()" (valueChange)="setDept($event)">
+          <mat-option value="">Tous</mat-option>
+          @for (dep of deptOptions(); track dep) {
+            <mat-option [value]="dep">{{ dep }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="tb-row tb-actions">
+      <button mat-flat-button color="primary" type="button" (click)="createNew()">
+        <mat-icon>note_add</mat-icon>
+        Nouvelle fiche
+      </button>
+    </div>
+  </section>
+
+  <section class="panel tbl-panel">
+    <div class="tbl-scroll">
+      <table mat-table [dataSource]="pagedRows()" class="dense">
+        <ng-container matColumnDef="employee">
+          <th mat-header-cell *matHeaderCellDef>Employé</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="emp">
+              <div class="avatar" [style.background]="avatarColor(row)">{{ row.employeeInitials }}</div>
+              <div class="txt">
+                <div class="name">{{ row.employeeName }}</div>
+                <div class="muted sm">{{ row.department }}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef>Département</th>
+          <td mat-cell *matCellDef="let row">
+            <span [class]="deptPillClass(row.department)">{{ row.department }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="brut">
+          <th mat-header-cell *matHeaderCellDef>Brut</th>
+          <td mat-cell *matCellDef="let row" class="mono">{{ fmt(row.grossSalary) }} {{ row.currency }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cotisations">
+          <th mat-header-cell *matHeaderCellDef>Cotisations (brut − net)</th>
+          <td mat-cell *matCellDef="let row" class="mono muted">
+            {{ fmt(cotisations(row)) }} {{ row.currency }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="net">
+          <th mat-header-cell *matHeaderCellDef>Net</th>
+          <td mat-cell *matCellDef="let row" class="mono net-cell">
+            {{ fmt(netAmount(row)) }} {{ row.currency }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="evolution">
+          <th mat-header-cell *matHeaderCellDef>Évolution</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.evolution === 0) {
+              <span class="muted">—</span>
+            } @else {
+              <span class="evo" [class]="evoClass(row.evolution)">
+                {{ row.evolution > 0 ? '+' : '' }}{{ row.evolution.toLocaleString('fr-MA') }} %
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let row">{{ typeLabel(row.type) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="effectiveDate">
+          <th mat-header-cell *matHeaderCellDef>Date d’effet</th>
+          <td mat-cell *matCellDef="let row">{{ formatEffective(row.effectiveDate) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="ac"></th>
+          <td mat-cell *matCellDef="let row" class="ac">
+            <div class="acts">
+              <button mat-icon-button type="button" matTooltip="Bulletin" (click)="openSlip(row)">
+                <mat-icon>receipt_long</mat-icon>
+              </button>
+              <button mat-icon-button type="button" matTooltip="PDF" (click)="download(row)">
+                <mat-icon>picture_as_pdf</mat-icon>
+              </button>
+              <button mat-icon-button type="button" matTooltip="Modifier" (click)="openEdit(row)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackById"></tr>
+      </table>
+    </div>
+  </section>
+
+  <mat-paginator
+    [length]="filteredRows().length"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    showFirstLastButtons
+    (page)="onPaginate($event)"
+  />
+</div>

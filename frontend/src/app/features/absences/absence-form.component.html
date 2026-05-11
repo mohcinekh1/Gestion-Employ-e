@@ -1,0 +1,111 @@
+<h2 mat-dialog-title>Nouvelle demande d’absence</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="dlg-body">
+    @if (submitError) {
+      <p class="err">{{ submitError }}</p>
+    }
+
+    @if (employeeLocked() && form.controls.employeeId.value == null) {
+      <p class="err">Votre compte n’est pas lié à un employé. Contactez un administrateur.</p>
+    }
+
+    <div class="grid-form">
+      @if (employeeLocked()) {
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Employé</mat-label>
+          <input matInput readonly tabindex="-1" [value]="lockedEmployeeLine() ?? ''" />
+        </mat-form-field>
+      } @else {
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Employé</mat-label>
+          <mat-select formControlName="employeeId" required>
+            @for (e of employeeService.employeeChoices(); track e.employeeId) {
+              <mat-option [value]="e.employeeId">{{ e.employeeName }} — {{ e.department }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.employeeId.hasError('required') && form.controls.employeeId.touched) {
+            <mat-error>Requis</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type" required>
+          @for (t of types; track t) {
+            <mat-option [value]="t">{{ typeLabelPick(t) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="ps" formControlName="startDate" autocomplete="off" />
+        <mat-datepicker-toggle matSuffix [for]="ps" />
+        <mat-datepicker #ps />
+        <mat-hint>jj/mm/aaaa</mat-hint>
+        @if (form.controls.startDate.hasError('required') && form.controls.startDate.touched) {
+          <mat-error>Requis</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date fin</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pe"
+          formControlName="endDate"
+          [min]="form.controls.startDate.value"
+          autocomplete="off"
+        />
+        <mat-datepicker-toggle matSuffix [for]="pe" />
+        <mat-datepicker #pe />
+        <mat-hint>jj/mm/aaaa</mat-hint>
+        @if (form.controls.endDate.hasError('required') && form.controls.endDate.touched) {
+          <mat-error>Requis</mat-error>
+        }
+      </mat-form-field>
+
+      @if (form.hasError('dateOrder')) {
+        <div class="hint span-2 warn">La date de fin doit être après la date de début.</div>
+      }
+
+      <div class="hint span-2">
+        <span class="lab">Jours ouvrés</span>
+        <strong class="font-mono">{{ workingDaysPreview().toLocaleString('fr-MA') }}</strong>
+      </div>
+
+      @if (remoteBalance() != null) {
+        <div class="hint span-2">
+          <span class="lab">Solde restant (API)</span>
+          <strong class="font-mono">{{ remoteBalance()!.toLocaleString('fr-MA') }}</strong>
+        </div>
+      }
+
+      @if (insufficientError()) {
+        <div class="hint span-2 warn">Solde insuffisant pour cette durée.</div>
+      }
+      @if (overlapError()) {
+        <div class="hint span-2 warn">Ce créneau chevauche une demande ou une absence déjà enregistrée.</div>
+      }
+
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Motif (obligatoire si exceptionnel)</mat-label>
+        <textarea matInput rows="3" formControlName="reason"></textarea>
+        @if (
+          form.controls.reason.hasError('required') &&
+          form.controls.reason.touched &&
+          form.controls.type.value === 'EXCEPTIONNEL'
+        ) {
+          <mat-error>Motif requis pour une absence exceptionnelle.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dlg-actions">
+    <button mat-stroked-button type="button" (click)="cancel()" [disabled]="submitting">Annuler</button>
+    <button mat-flat-button type="submit" color="primary" [disabled]="submitting">Envoyer la demande</button>
+  </mat-dialog-actions>
+</form>

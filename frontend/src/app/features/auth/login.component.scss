@@ -1,0 +1,5 @@
+@use './auth-forms.shared.scss';
+
+:host ::ng-deep .auth-card {
+  padding-top: 22px;
+}

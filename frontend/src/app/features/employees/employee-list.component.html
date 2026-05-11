@@ -1,0 +1,271 @@
+<div class="emp-page">
+  @if (svc.loadError()) {
+    <p class="banner-err">{{ svc.loadError() }}</p>
+  }
+
+  <div class="stats-row">
+    <article class="stat-card">
+      <span class="stat-lab">Total</span>
+      <strong class="stat-val font-mono">{{ statsTotal().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">Actifs</span>
+      <strong class="stat-val font-mono st-green">{{ statsActifs().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">Inactifs</span>
+      <strong class="stat-val font-mono st-muted">{{ statsInactifs().toLocaleString('fr-MA') }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-lab">Services</span>
+      <strong class="stat-val font-mono st-blue">{{ statsDeptCount().toLocaleString('fr-MA') }}</strong>
+    </article>
+  </div>
+
+  <section class="panel toolbar-panel">
+    <div class="filters">
+      <mat-form-field appearance="outline" class="fusearch" subscriptSizing="dynamic">
+        <mat-label>Rechercher</mat-label>
+        <input
+          matInput
+          type="search"
+          placeholder="Nom, email…"
+          [value]="searchQuery()"
+          (input)="onSearchInput($any($event.target).value)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="fuselect" subscriptSizing="dynamic">
+        <mat-label>Département</mat-label>
+        <mat-select [value]="deptFilter()" (valueChange)="setDept($event)">
+          <mat-option value="">Tous</mat-option>
+          @for (d of svc.departments(); track d.id) {
+            <mat-option [value]="'' + d.id">{{ d.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="fuselect" subscriptSizing="dynamic">
+        <mat-label>Statut</mat-label>
+        <mat-select [value]="statusFilter()" (valueChange)="setStatus($event)">
+          <mat-option value="">Tous</mat-option>
+          @for (s of statuses; track s) {
+            <mat-option [value]="s">{{ s }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-button-toggle-group
+        class="view-toggle"
+        [value]="viewMode()"
+        (change)="onViewChange($event)"
+        hideSingleSelectionIndicator
+      >
+        <mat-button-toggle value="table" matTooltip="Tableau">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="grid" matTooltip="Grille">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="bulk-actions">
+      <button mat-stroked-button type="button" (click)="exportCsv()">
+        <mat-icon>download</mat-icon>
+        Exporter
+      </button>
+      <button mat-flat-button color="primary" type="button" (click)="openCreate()">
+        <mat-icon>person_add</mat-icon>
+        Nouvel employé
+      </button>
+    </div>
+  </section>
+
+  @if (svc.loading()) {
+    <p class="loading-hint">Chargement…</p>
+  }
+
+  @if (viewMode() === 'table') {
+    <section class="panel table-panel">
+      <div class="table-scroll">
+        <table mat-table [dataSource]="svc.pageRows()" class="mat-elevation-z0 dense-table">
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox
+                color="primary"
+                (change)="onMasterCheck($event.checked)"
+                [checked]="isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                [aria-label]="checkboxLabel()"
+              />
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox
+                color="primary"
+                (click)="$event.stopPropagation()"
+                (change)="onRowCheck(row, $event.checked)"
+                [checked]="selection.isSelected(row)"
+                [aria-label]="checkboxLabel(row)"
+              />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="employee">
+            <th mat-header-cell *matHeaderCellDef>Employé</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="emp-cell">
+                <div class="avatar" [style.background]="avatarColor(row)">
+                  {{ initials(row) }}
+                </div>
+                <div class="emp-meta">
+                  <div class="emp-name">{{ row.firstName }} {{ row.lastName }}</div>
+                  <div class="emp-mail">{{ row.email }}</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="department">
+            <th mat-header-cell *matHeaderCellDef>Département</th>
+            <td mat-cell *matCellDef="let row">
+              <span [class]="deptPillClass(row.department)">
+                {{ row.department }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef>Poste</th>
+            <td mat-cell *matCellDef="let row">{{ row.position }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let row">
+              <span [class]="statusPillClass(row.status)">
+                <i></i>{{ row.status }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="salary">
+            <th mat-header-cell *matHeaderCellDef>Dernier salaire</th>
+            <td mat-cell *matCellDef="let row" class="mono-cell">
+              {{ formatSalary(row.salary) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="hireDate">
+            <th mat-header-cell *matHeaderCellDef>Date embauche</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.hireDate | date: 'mediumDate':'':'fr' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="col-actions"></th>
+            <td mat-cell *matCellDef="let row" class="col-actions cell-actions">
+              <div class="row-actions">
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Voir"
+                  aria-label="Voir"
+                  (click)="openView(row)"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Modifier"
+                  aria-label="Modifier"
+                  (click)="openEdit(row)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                @if (isAdminUser()) {
+                  <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Promouvoir manager"
+                    aria-label="Promouvoir manager"
+                    (click)="promoteToManager(row)"
+                  >
+                    <mat-icon>supervisor_account</mat-icon>
+                  </button>
+                }
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Supprimer"
+                  aria-label="Supprimer"
+                  (click)="confirmDelete(row)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns; trackBy: trackById"
+          ></tr>
+        </table>
+      </div>
+    </section>
+  } @else {
+    <section class="grid-panel">
+      <div class="card-grid">
+        @for (row of svc.pageRows(); track row.id) {
+          <article class="emp-card panel">
+            <div class="emp-card-head">
+              <mat-checkbox
+                color="primary"
+                [checked]="selection.isSelected(row)"
+                (change)="onRowCheck(row, $event.checked)"
+              />
+              <div class="avatar lg" [style.background]="avatarColor(row)">
+                {{ initials(row) }}
+              </div>
+              <div class="emp-meta">
+                <div class="emp-name">{{ row.firstName }} {{ row.lastName }}</div>
+                <div class="emp-mail">{{ row.email }}</div>
+              </div>
+            </div>
+            <span [class]="deptPillClass(row.department)">{{ row.department }}</span>
+            <p class="pos">{{ row.position }}</p>
+            <span [class]="statusPillClass(row.status)"><i></i>{{ row.status }}</span>
+            <div class="grid-foot font-mono">
+              {{ formatSalary(row.salary) }}
+              <span class="sep"></span>
+              {{ row.hireDate | date: 'mediumDate':'':'fr' }}
+            </div>
+            <div class="grid-actions">
+              <button mat-stroked-button type="button" (click)="openView(row)">Voir</button>
+              <button mat-stroked-button type="button" (click)="openEdit(row)">Modifier</button>
+              @if (isAdminUser()) {
+                <button mat-stroked-button type="button" (click)="promoteToManager(row)">
+                  Manager
+                </button>
+              }
+              <button mat-flat-button color="warn" type="button" (click)="confirmDelete(row)">Supprimer</button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <mat-paginator
+    [length]="svc.totalElements()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    showFirstLastButtons
+    (page)="onPaginate($event)"
+  />
+</div>

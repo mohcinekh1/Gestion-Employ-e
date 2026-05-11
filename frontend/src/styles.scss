@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+:root {
+  --bg0: #f7f6f3;
+  --bg1: #ffffff;
+  --bg2: #f0eee9;
+  --ink1: #1a1916;
+  --ink2: #6b6960;
+  --ink3: #9b9a95;
+  --border: #e2e0da;
+
+  --blue-50: #e6f1fb;
+  --blue-600: #185fa5;
+  --blue-800: #0c447c;
+
+  --green-50: #eaf3de;
+  --green-600: #3b6d11;
+  --green-700: #31600e;
+  --green-800: #27500a;
+
+  --amber-50: #faeeda;
+  --amber-600: #854f0b;
+  --amber-800: #633806;
+
+  --teal-50: #e1f5ee;
+  --teal-600: #0f6e56;
+  --teal-800: #085041;
+
+  --coral-50: #faece7;
+  --coral-600: #993c1d;
+  --coral-800: #712b13;
+
+  --gray-50: #efeeea;
+  --gray-600: #5c5b56;
+  --gray-800: #454440;
+
+  /** Badges violet / accent list (avatars) */
+  --violet-600: #534ab7;
+
+  --chart-hire: #378add;
+  --chart-leave: #e2e0da;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg0);
+  color: var(--ink1);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.mat-body-medium,
+.mat-mdc-tooltip,
+.mat-mdc-snack-bar-container,
+.mat-mdc-form-field,
+.mat-mdc-paginator,
+.mat-mdc-table,
+.mat-expansion-panel,
+.mat-expansion-panel-content {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+}

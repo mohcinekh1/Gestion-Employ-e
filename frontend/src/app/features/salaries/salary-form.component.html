@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content class="dlg">
+  @if (serverError) {
+    <p class="muted" style="margin-bottom: 12px">{{ serverError }}</p>
+  }
+  <form [formGroup]="form" id="salary-form-el" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="span-2">
+      <mat-label>Employé</mat-label>
+      <mat-select formControlName="employeeId">
+        @for (emp of employeeService.employeeChoices(); track emp.employeeId) {
+          <mat-option [value]="emp.employeeId">
+            {{ emp.employeeId }} — {{ emp.employeeName }} ({{ emp.department }})
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.controls.employeeId.invalid && form.controls.employeeId.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Montant brut</mat-label>
+      <input matInput type="number" formControlName="amount" min="1" step="100" />
+      @if (form.controls.amount.hasError('required') && form.controls.amount.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date d’effet</mat-label>
+      <input matInput type="date" formControlName="effectiveDate" />
+      @if (form.controls.effectiveDate.invalid && form.controls.effectiveDate.touched) {
+        <mat-error>Requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="type">
+        @for (t of typeOptions; track t.value) {
+          <mat-option [value]="t.value">{{ t.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Devise</mat-label>
+      <mat-select formControlName="currency">
+        @for (c of currencyOptions; track c) {
+          <mat-option [value]="c">{{ c }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="span-2">
+      <mat-label>Note</mat-label>
+      <input matInput formControlName="note" />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()" [disabled]="saving">Annuler</button>
+  <button mat-flat-button color="primary" type="submit" form="salary-form-el" [disabled]="saving">
+    Enregistrer
+  </button>
+</mat-dialog-actions>

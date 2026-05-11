@@ -1,0 +1,109 @@
+.slip {
+  min-width: 360px;
+}
+
+.slip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--blue-600), var(--teal-600));
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+}
+
+.brand strong {
+  display: block;
+  font-size: 14px;
+  color: var(--ink1);
+}
+
+.sub {
+  font-size: 11.5px;
+  color: var(--ink2);
+  margin-top: 2px;
+}
+
+.meta .emp-name {
+  margin: 0;
+  font-size: 18px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.muted {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink2);
+  text-transform: capitalize;
+}
+
+.slip-body {
+  padding-top: 0 !important;
+}
+
+.lines {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lines td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink1);
+}
+
+.lines .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: 'DM Mono', monospace;
+}
+
+.lines .muted {
+  color: var(--ink2);
+}
+
+.lines .hint {
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.total-row td {
+  border-bottom: none;
+  padding-top: 16px;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.net {
+  color: var(--green-800);
+  font-size: 15px;
+}

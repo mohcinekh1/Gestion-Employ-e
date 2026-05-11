@@ -1,0 +1,53 @@
+.dlg-body {
+  padding-top: 8px !important;
+  max-width: 440px;
+}
+
+.err {
+  color: var(--coral-600);
+  font-size: 13px;
+  margin-top: 0;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  font-size: 13px;
+
+  .k {
+    color: var(--ink3);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+  }
+
+  .v {
+    color: var(--ink1);
+  }
+}
+
+.reject-form {
+  margin-top: 14px;
+
+  .full {
+    width: 100%;
+  }
+
+  &::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--bg2);
+    border-radius: 10px;
+  }
+}
+
+.dlg-actions {
+  padding: 16px 24px 18px !important;
+  gap: 8px;
+}
